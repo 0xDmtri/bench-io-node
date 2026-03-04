@@ -3,11 +3,11 @@
 
 use std::{hint::black_box, path::Path};
 
-use alloy_primitives::{Address, address};
-use criterion::{Criterion, criterion_group, criterion_main};
+use alloy_primitives::{address, Address};
+use criterion::{criterion_group, criterion_main, Criterion};
 use reth_optimism_chainspec::BASE_MAINNET;
 use reth_optimism_node::OpNode;
-use reth_provider::{BlockNumReader, providers::ReadOnlyConfig};
+use reth_provider::{providers::ReadOnlyConfig, BlockNumReader};
 
 const DEFAULT_DATA_DIR_BASE: &str = "/data/base/op-reth";
 const TARGET_ADDR: Address = address!("4200000000000000000000000000000000000006");
@@ -30,13 +30,16 @@ fn bench_provider_basic_account(c: &mut Criterion) {
         .unwrap();
     let block_number = factory.best_block_number().unwrap();
 
-    c.bench_function("base: ProviderFactory.history_by_block_number + basic_account", |b| {
-        b.iter(|| {
-            let provider = factory.history_by_block_number(block_number).unwrap();
-            let account = provider.basic_account(&TARGET_ADDR).unwrap();
-            black_box(account);
-        })
-    });
+    c.bench_function(
+        "base: ProviderFactory.history_by_block_number + basic_account",
+        |b| {
+            b.iter(|| {
+                let provider = factory.history_by_block_number(block_number).unwrap();
+                let account = provider.basic_account(&TARGET_ADDR).unwrap();
+                black_box(account);
+            })
+        },
+    );
 }
 
 criterion_group!(benches, bench_provider_basic_account);
